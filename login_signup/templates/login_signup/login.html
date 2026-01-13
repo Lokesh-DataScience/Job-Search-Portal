@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login · JobNexus</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'jobs/css/style.css' %}">
+
+  <style>
+    /* Small page-specific overrides to reuse the site styles */
+    .auth-wrapper { min-height: 100vh; display:flex; align-items:center; justify-content:center; padding: 120px 20px; }
+    .auth-card { max-width: 920px; width:100%; display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 768px) { .auth-card { grid-template-columns: 1fr; } }
+    .auth-left { padding: 40px; }
+    .auth-right { padding: 40px; position: relative; z-index: 2; }
+    .auth-left { position: relative; z-index: 2; }
+    .auth-title { font-size: 1.75rem; font-weight: 800; margin-bottom: 8px; }
+    /* Ensure pseudo-elements from .feature-card don't block interactions */
+    .feature-card::before { z-index: 0; pointer-events: none; }
+    .auth-right input, .auth-right textarea, .auth-right select { pointer-events: auto; }
+    .auth-desc { color: var(--gray); margin-bottom: 22px; }
+
+    .auth-input { width:100%; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--gray-light); margin-bottom: 12px; font-size: 15px; }
+    /* Ensure auto-rendered form fields match the auth input style */
+    .auth-right input[type="text"], .auth-right input[type="password"], .auth-right input[type="email"], .auth-right input[type="checkbox"], .auth-right textarea {
+      width:100%; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--gray-light); margin-bottom: 12px; font-size: 15px; box-sizing: border-box;
+    }
+    .auth-submit { width:100%; padding: 14px; border-radius: 12px; font-weight:700; }
+    .auth-links { display:flex; justify-content:space-between; align-items:center; gap: 12px; margin-top: 8px; }
+    .form-error { color: var(--error); margin-bottom: 12px; }
+    .small-muted { color: var(--gray); font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+  <!-- Header (kept in sync with main site) -->
+  <header>
+    <div class="container nav-container">
+      <a href="{% url 'home' %}" class="logo">
+        <div class="logo-icon"><i class="fas fa-briefcase"></i></div>
+        JobNexus
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+          <li><a href="{% url 'home' %}#jobs" class="nav-link">Jobs</a></li>
+          <li><a href="{% url 'home' %}#companies" class="nav-link">Companies</a></li>
+          <li><a href="{% url 'home' %}#about" class="nav-link">About</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        {% if user.is_authenticated %}
+          <form method="post" action="{% url 'logout' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary">Logout</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-secondary">Login</a>
+          <a href="{% url 'register' %}" class="btn">Register</a>
+        {% endif %}
+        <div class="hamburger"><span></span><span></span><span></span></div>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="auth-wrapper">
+    <div class="container">
+      <div class="auth-card feature-card">
+
+        <div class="auth-left">
+          <h2 class="auth-title">Welcome back 👋</h2>
+          <p class="auth-desc">Sign in to manage your applications, save jobs and follow companies you love.</p>
+
+          <!-- Decorative / informational content -- you can replace with an illustration -->
+          <div style="margin-top:18px">
+            <dotlottie-wc src="https://lottie.host/4a6a1b0e-0000-0000-0000-000000000000/sample.lottie" style="width:100%;max-width:360px;height:auto" speed="1" autoplay loop></dotlottie-wc>
+          </div>
+
+        </div>
+
+        <div class="auth-right">
+
+          {% if messages %}
+            {% for message in messages %}
+              <div class="form-error">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+
+          {% if error %}
+            <div class="form-error">{{ error }}</div>
+          {% endif %}
+
+          {% if form %}
+            <form method="post" action="">
+              {% csrf_token %}
+
+              {% if form.non_field_errors %}
+                <div class="form-error">{{ form.non_field_errors }}</div>
+              {% endif %}
+
+              {% if form.username.errors %}
+                <div class="form-error">{{ form.username.errors }}</div>
+              {% endif %}
+              {{ form.username }}
+
+              {% if form.password.errors %}
+                <div class="form-error">{{ form.password.errors }}</div>
+              {% endif %}
+              {{ form.password }}
+
+              <div class="auth-links">
+                <label class="small-muted"><input type="checkbox" name="remember"> Remember me</label>
+                <a class="small-muted" href="#">Forgot password?</a>
+              </div>
+
+              <button type="submit" class="btn btn-accent auth-submit">Sign In</button>
+            </form>
+          {% else %}
+            <!-- fallback simple form if view does not pass a form variable -->
+            <form method="post" action="">
+              {% csrf_token %}
+              <input class="auth-input" type="text" name="username" placeholder="Username or email" required>
+              <input class="auth-input" type="password" name="password" placeholder="Password" required>
+              <div class="auth-links">
+                <label class="small-muted"><input type="checkbox" name="remember"> Remember me</label>
+                <a class="small-muted" href="#">Forgot password?</a>
+              </div>
+              <button type="submit" class="btn btn-accent auth-submit">Sign In</button>
+            </form>
+          {% endif %}
+
+          <p style="margin-top:14px" class="small-muted">Don't have an account? <a href="{% url 'register' %}">Create one</a></p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div style="padding:40px 0;text-align:center;color:var(--gray)">© 2025 JobNexus. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+  <script src="{% static 'jobs/js/script.js' %}"></script>
+</body>
+</html>
