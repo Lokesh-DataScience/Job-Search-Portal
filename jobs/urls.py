@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import job_list, post_job, apply_job, google_jobs, microsoft_jobs, apple_jobs, amazon_jobs, meta_jobs, salesforce_jobs
+from .api_views import BulkJobCreateAPIView
 
 urlpatterns = [
     path('', job_list, name='home'),
@@ -11,4 +12,5 @@ urlpatterns = [
     path('amazon/', amazon_jobs, name='amazon_jobs'),
     path('meta/', meta_jobs, name='meta_jobs'),
     path('salesforce/', salesforce_jobs, name='salesforce_jobs'),
+    path("api/jobs/bulk-create/", BulkJobCreateAPIView.as_view(), name="bulk_job_create"),
 ]
