@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: job-search-engine
+    runtime: python
+    pythonVersion: 3.11
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn job_search_engine.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        fromDatabase:
+          name: job_search_db
+          property: SECRET_KEY
+      - key: DEBUG
+        value: "False"
